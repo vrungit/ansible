@@ -1,0 +1,20 @@
+- hosts: all
+  gather_facts: yes
+  tasks:
+  - name: check if httpd service is running
+    command: systemctl status httpd.service
+    args:
+      warn: no
+    register: pblighttpd_running
+    ignore_errors: true
+
+  - debug:
+      var: pblighttpd_running
+
+  - name: if pblighttpd not running in hosts, print pblighttpd is not running in host name
+    shell: echo -e "pblighttpd not running in `hostname`" >> pblighttpd_status_file
+    when: pblighttpd_running.stdout_lines|regex_search('running|inactive') == 'inactive'
+
+  - name: if pblighttpd running in hosts, print pblighttpd is running in host name
+    shell: echo -e "pblighttpd running in `hostname`" >> pblighttpd_status_file
+    when: pblighttpd_running.stdout_lines|regex_search('running|inactive') == 'running'

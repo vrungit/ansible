@@ -1,0 +1,43 @@
+#By default, handlers run after all the tasks in a particular play have been completed. 
+#This approach is efficient, because the handler only runs once, regardless of how many tasks notify it. 
+#For example, if multiple tasks update a configuration file and notify a handler to restart Apache,
+#Ansible only bounces Apache once to avoid unnecessary restarts.
+#If you need handlers to run before the end of the play, add a task to flush them using the meta module,
+#which executes Ansible actions.
+
+
+- hosts: all
+  become: yes
+  tasks:
+  - name:  Copy httpd config file  
+    ansible.builtin.template:
+      src: httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify: 
+      - Restart httpd service
+      
+  - meta: flush_handlers
+
+  - name:  Copy httpd welcome config file
+    ansible.builtin.template:
+      src: welcome.conf.j2
+      dest: /etc/httpd/conf.d/welcome.conf
+    notify: 
+      - Restart httpd service
+      
+  - meta: flush_handlers
+
+  - name:  Copy httpd userdir config file
+    ansible.builtin.template:
+      src: userdir.conf.j2
+      dest: /etc/httpd/conf.d/userdir.conf
+    notify: 
+      - Restart httpd service
+
+  handlers:
+    - name: Restart httpd service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+ 

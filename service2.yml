@@ -1,0 +1,25 @@
+- hosts: all
+  gather_facts: yes
+  
+  tasks:
+
+  - name: Check vsftpd service if running 
+    ansible.builtin.shell:
+      cmd: systemctl status vsftpd.service 
+    register: status
+    ignore_errors: true
+    no_log: true
+
+
+  - name: Create dead file
+    shell:
+      cmd: echo {{ansible_hostname }} >>  /tmp/dead
+    when: status.stdout_lines| regex_search('inactive|running')  == 'inactive'
+    delegate_to: localhost
+
+  - name: Create alive file 
+    shell:
+      cmd: echo {{ansible_hostname }} >>  /tmp/live
+    when: status.stdout_lines| regex_search('inactive|running')  == 'running'
+    delegate_to: localhost
+    

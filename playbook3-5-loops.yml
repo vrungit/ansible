@@ -1,0 +1,20 @@
+- hosts: all
+  gather_facts: no
+  become: true
+  vars: 
+    venki:
+      - nginx
+      - git-core
+      - socat
+  
+  tasks:
+  - name: Install softwares 
+    ansible.builtin.yum:
+      name: "{{ venki }}"
+      state: absent
+
+     
+    
+      
+    
+   

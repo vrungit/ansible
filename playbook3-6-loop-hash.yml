@@ -1,0 +1,14 @@
+- hosts: all
+  gather_facts: no
+  become: true
+  
+  tasks:
+  - name: Add users to right groups
+    ansible.builtin.user:
+       name: "{{ item.uname }}"
+       state: absent
+       groups: "{{ item.gname }}"
+    loop:
+    - { uname: 'testuser301', gname: 'wheel' }
+    - { uname: 'testuser302', gname: 'root' }
+    

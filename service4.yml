@@ -1,0 +1,26 @@
+- hosts: all
+  gather_facts: yes
+
+  tasks:
+
+  - name: Check if pblighttpd service if running
+    ansible.builtin.shell:
+      cmd: systemctl status pblighttpd.service
+    register: status
+    ignore_errors: true
+    no_log: true
+
+
+  - name: Create inactive inventory  file
+    shell:
+      cmd: echo {{ansible_fqdn }} >>  /tmp/inactive
+    when: status.stdout_lines| regex_search('inactive|running')  == 'inactive'
+    delegate_to: localhost
+    become: false
+
+  - name: Create active inventory  file
+    shell:
+      cmd: echo {{ansible_fqdn }} >>  /tmp/active
+    when: status.stdout_lines| regex_search('inactive|running')  == 'running'
+    delegate_to: localhost
+    become: false

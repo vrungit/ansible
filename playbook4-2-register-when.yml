@@ -1,0 +1,16 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: check if nginx is installed 
+      command: yum list installed nginx
+      args:
+        warn: no
+      register: installed
+      ignore_errors: true
+
+    - debug:
+        var:  installed.rc 
+
+   # - name:  Install httpd if nginx is not installed 
+   #   shell: yum -y install httpd
+   #   when: installed.rc == 1

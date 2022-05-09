@@ -1,0 +1,15 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: create new users and add to wheel 
+    ansible.builtin.user:
+      name: "{{ item }}"
+      state: present
+      groups: "wheel"
+    loop:
+      - testuser1
+      - testuser2
+      - testuser3
+      - testuser4
+    become: true
+   

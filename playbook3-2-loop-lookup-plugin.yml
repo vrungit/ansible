@@ -1,0 +1,15 @@
+#We use the lokup plugin to get the list of users
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: create new users and add to wheel 
+    ansible.builtin.user:
+      name: "{{ item }}"
+      state: absent
+      groups: "wheel"
+    loop: "{{ lookup('file', '/tmp/newusers').splitlines() }}"
+      
+    become: true
+   

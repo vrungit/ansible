@@ -1,0 +1,169 @@
+---
+- hosts: webservers
+  tasks:
+  - name: Ansible create file with content example
+    file:
+      path: /home/ansible_user1/ansible-execution-dir
+      state: directory
+      mode: "u=rwx,g=rwx,o=rx"
+      recurse: yes
+
+
+  - name: Ansible create new file with permissions example.
+    file:
+      path: /home/ansible_user1/ansible-execution-dir/testfile-ansible.txt
+      state: touch
+      mode: 0755
+      owner: ansible_user1
+
+  - name: Ansible create file with content example
+    copy:
+      dest: /home/ansible_user1/ansible-execution-dir/testfile-ansible2.txt
+      mode: 0764
+      content: |
+        dog1
+        tiger
+        mango 2
+
+  - name: Ansible create file with content example
+    copy:
+      dest: /home/ansible_user1/ansible-execution-dir/testfile-ansible3.txt
+      mode: 0764
+      content: >
+        dog1
+        tiger
+        mango 2
+
+  - name: Run a command using a templated variable (always use quote filter to avoid injection)
+    shell: cat /home/ansible_user1/ansible-execution-dir/testfile-ansible2.txt >> /home/ansible_user1/ansible-execution-dir/testfile-ansible2_copyyy.txt
+
+
+- hosts: totest_servers
+  tasks:
+  - name: This is basic connectivity test
+    ping:
+
+#- hosts: ctrl_sr2
+#  tasks:
+#  - name: use argv to send the command as a list.Be sure to leave the command empty.
+#    command: touch "{{ test_file }}"
+#    args:
+#      chdir: "{{ test_dir }}"
+#      creates: "{{ test_file }}"
+
+- hosts: ctrl_sr1
+  tasks:
+    - name: check  if firewalld is installed
+      command: yum list installed firewalld
+      args:
+        warn: no
+      register: firewalld_installed
+      ignore_errors: true
+
+    - debug:
+        var: firewalld_installed
+
+#- hosts: ctrl_sr2
+#  tasks:
+#    - name: check if python3 is installed
+#      command: yum list installed python3
+#      args:
+#        warn: no
+#      register: python3_installed
+#
+#    - debug:
+#        var: python3_installed
+
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: check if python is installed
+      command: yum list installed python
+      args:
+        warn: no
+      register: python_installed
+      ignore_errors: true
+
+    - debug:
+        var: python_installed
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: check if python3 is installed
+      command: yum list installed python3
+      args:
+        warn: no
+      register: python3_installed
+      ignore_errors: true
+
+    - debug:
+        var: python3_installed
+
+    - name: if python3 not installed in ctrl_sr2 hosts, print python3 is not installed in host name
+      shell: echo -e "python3 not installed in `hostname`" > /home/ansible_user1/ansible_execution_var_dir/python3_unavailable_log_00
+      when: python3_installed.rc == 1
+
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: check if telnet is installed
+      command: yum list installed telnet
+      args:
+        warn: no
+      register: telnet_installed
+      ignore_errors: true
+
+    - debug:
+        var: telnet_installed
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: if python3 not installed in ctrl_sr2 hosts, print python3 is not installed in host name
+      shell: echo -e "python3 not installed in `hostname`" > /home/ansible_user1/ansible_execution_var_dir/python3_unavailable_log
+      when: python3_installed.rc == 1
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: if python3 not installed in ctrl_sr2 hosts, print python3 is installed in host name
+      shell: echo -e "python3 installed in `hostname`" > /home/ansible_user1/ansible_execution_var_dir/python3_available_log
+      when: python3_installed.rc == 0
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: if telnet is installed in ctrl_sr2 hosts, print telnet is installed in host name
+      shell: echo -e "telnet installed in `hostname`" > /home/ansible_user1/ansible_execution_var_dir/telnet_available_log
+      when: telnet_installed.rc == 0
+
+- hosts: ctrl_sr2
+  tasks:
+    - name: check if yamllint exist on the machine
+      shell: which yamllint
+      args:
+        warn: no
+      register: yamllint_installed
+      ignore_errors: true
+
+#- hosts: ctrl_sr2
+#  tasks:
+    - name: check status of yamllint availability and take action
+      yum:
+        name:
+          - python3
+        state: latest
+      when: yamllint_installed.rc == 1
+      become: yes
+      register: python3_installation_based_on_condition
+      ignore_errors: true
+
+    - debug:
+        var: python3_installation_based_on_condition
+
+    - name: install yamllint post python3 install
+      shell: pip3 install yamllint
+      when: python3_installation_based_on_condition.rc == 0
+      become: yes
+      register: yamllint_install_status
+      ignore_errors: true
+
+    - debug:
+        var: yamllint_install_status

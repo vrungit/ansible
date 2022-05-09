@@ -1,0 +1,39 @@
+
+# For example, you may want to restart a service if a task updates the configuration of that service, 
+# but not if the configuration is unchanged. Ansible uses handlers to address this use case.
+# Handlers are tasks that only run when notified. Each handler should have a globally unique name.
+# Please note that the even throucgh we have two notify to restart apache ,
+# the ansible would run the handler just once
+
+
+- hosts: all
+  become: yes
+  tasks:
+  
+  - name:  Install httpd
+    ansible.builtin.yum:
+      name: httpd
+      state: present
+
+  - name:  Copy httpd config file  
+    ansible.builtin.template:
+      src: httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify: 
+      - Restart httpd service
+
+
+  - name:  Copy httpd welcome config file
+    ansible.builtin.template:
+      src: welcome.conf.j2
+      dest: /etc/httpd/conf.d/welcome.conf
+    notify: 
+      - Restart httpd service
+
+  handlers:
+    - name: Restart httpd service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+ 

@@ -1,0 +1,20 @@
+# item keyword should be used when we use the loop mdule
+
+- hosts: all
+  become: yes
+  gather_facts: no
+  vars:
+    users:
+      - testuser100
+      - testuser200
+      - testuser300
+      - testuser400
+
+  tasks:
+  - name: create new users and add to wheel 
+    ansible.builtin.user:
+      name: "{{ item }}"
+      state: absent
+    loop: "{{ users }}"
+  
+   

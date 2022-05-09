@@ -1,0 +1,12 @@
+- hosts: ansible1
+  become: yes
+  strategy: debug
+  vars_prompt: 
+    - name: command
+      prompt: Enter the command
+      private: no
+
+  tasks:
+  - name: Number of rpm packages installed on the system
+    ansible.builtin.shell: command
+

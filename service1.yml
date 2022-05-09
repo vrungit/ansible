@@ -1,0 +1,23 @@
+- hosts: all
+  gather_facts: yes
+  become: true
+  tasks:
+
+  - name: Check vsftpd service if running 
+    ansible.builtin.shell:
+      cmd: systemctl status vsftpd.service 
+    register: status
+    ignore_errors: true
+    no_log: true
+
+
+  - name: Print custom messages
+    debug:
+      msg: Service is not running on {{ansible_hostname }}
+    when: status.stdout_lines| regex_search('inactive|running')  == 'inactive'
+
+  - name: Print custom messages
+    debug:
+      msg: Service is  running on {{ansible_hostname }}
+    when: status.stdout_lines| regex_search('inactive|running')  == 'running'
+    

@@ -1,0 +1,24 @@
+- hosts: all
+  become: yes
+  tasks:
+  - name: Install terraform rpm
+    ansible.builtin.yum:
+      name: vsftpd
+      state: present
+    register: tf
+    ignore_errors: true
+    no_log: true
+
+  - name: Print custom error message
+    ansible.builtin.fail:
+      msg: FAILURE
+    when: tf.rc == 1
+     
+  - name: Print custom  message
+    ansible.builtin.fail:
+      msg: SUCCESS
+    when: tf.rc == 0
+
+
+      
+ 

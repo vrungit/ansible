@@ -1,0 +1,35 @@
+# The task  notify will use the listen keyword to intimate all the service handlers to trigger the action.
+#This is useful to restarting multipe handlers using as single notify name 
+
+- hosts: all
+  become: yes
+  tasks:
+  - name:  Copy httpd config file  
+    ansible.builtin.template:
+      src: httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify: 
+      - Restart all
+
+  handlers:
+    - name: Restart httpd service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      listen: "Restart all"
+
+
+    - name: Restart mysql service
+      ansible.builtin.service:
+        name: mysqld
+        state: restarted
+      listen: "Restart all"
+
+    - name: Restart vsftpd service
+      ansible.builtin.service:
+        name: vsftpd
+        state: restarted
+      listen: "Restart all"
+
+
+ 

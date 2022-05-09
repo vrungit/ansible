@@ -1,0 +1,11 @@
+- hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    admin_email: "venkat.raman@tesco.com"
+  tasks:
+  - name: 
+    ansible.builtin.template:
+      src: motd.j2
+      dest: /etc/motd
+    

@@ -1,0 +1,11 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: execute a  shell command
+    ansible.builtin.shell:
+      cmd: "echo hello"
+    register: output
+
+  - debug: 
+      msg: "{{ output}}"
+  

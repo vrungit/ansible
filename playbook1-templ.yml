@@ -1,0 +1,18 @@
+#This playbook uses the template module and  copies a file to a remote system .
+#This playbook assumes that the "templates" dir is present in the current directory in which playbook resides
+- hosts: all
+  tasks:
+  - name: Template a file to /tmp/venki.conf
+    ansible.builtin.template:
+      src: test.j2
+      dest: /tmp/day10
+      owner: user1
+      group: user1
+      mode: '0644'
+    become: true
+    become_user: user1
+
+
+   
+
+ 

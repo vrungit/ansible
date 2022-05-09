@@ -1,0 +1,15 @@
+- hosts: all
+  gather_facts: no
+  vars:
+    userlist: "{{ lookup('file', '/tmp/newusers').splitlines() }}"
+
+  tasks:
+  - name: create new users and add to wheel 
+    ansible.builtin.user:
+      name: "{{ item }}"
+      state: absent
+      groups: "wheel"
+    loop: "{{ userlist }}"
+      
+    become: true
+   

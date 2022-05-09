@@ -1,0 +1,14 @@
+- hosts: all
+  gather_facts: yes
+  become: true
+  tasks:
+
+  - name: stop vsftpd service if running 
+    ansible.builtin.service:
+      name: vsftpd
+      state: stopped
+    register: status
+
+  - name: Print custom messages
+    debug:
+      msg: "{{status.state}}"
